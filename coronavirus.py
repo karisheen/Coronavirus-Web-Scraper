@@ -46,7 +46,13 @@ class Data:
 
         return "0"
 
-data = Data(API_KEY, PROJECT_TOKEN)
+    def get_list_of_countries(self):
+        countries = []
+        for country in self.data['country']:
+            countries.append(country['name'].lower())
+
+        return countries
+
 
 
 def speak(text):
@@ -54,4 +60,46 @@ def speak(text):
     engine.say(text)
     engine.runAndWait()
 
-speak("hello")
+
+def get_audio():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        audio = r.listen(source)
+        said = ""
+
+        try:
+            said = r.recognize_google(audio)
+        except Exception as e:
+            print("Exception:", str(e))
+
+    return said.lower()
+
+def main():
+    print("Started Program")
+    data = Data(API_KEY, PROJECT_TOKEN)
+
+    END_PHRASE = "Stop"
+
+    TOTAL_PATTERNS = {
+                    re.compile("[\w\s]+ total [\w\s]+ cases"):data.get_total_cases,
+                    re.compile("[\w\s]+ total cases"): data.get_total_cases,
+                    re.compile("[\w\s]+ total [\w\s]+ deaths"):data.get_total_deaths,
+                    re.compile("[\w\s]+ total deaths"):data.get_total_deaths,
+                    }
+
+    while True:
+        print("Listening...")
+        text = get_audio()
+        result = None
+
+        for pattern, func in TOTAL_PATTERNS.items():
+            if pattern.match(text):
+                result = func()
+                break
+        if result:
+            speak(result)
+
+        if text.find(END_PHRASE): #stop loop
+            break
+
+main()
