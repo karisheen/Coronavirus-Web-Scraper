@@ -1,0 +1,4 @@
+Pyttsx3
+Requests
+SpeechRecognition
+pywin32(windows)
