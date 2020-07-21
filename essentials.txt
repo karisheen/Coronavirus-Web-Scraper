@@ -1,4 +1,5 @@
+pywin32(windows)
 Pyttsx3
+Pyaudio
 Requests
 SpeechRecognition
-pywin32(windows)
